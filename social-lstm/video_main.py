@@ -14,7 +14,7 @@ args = get_args()
 # Load YOLO
 yolo_model = YOLO("yolov8n.pt")
 tracker = DeepSort(max_age=30)
-cap = VideoStream(src=0)
+cap = VideoStream(src=4)
 
 buffer = RealTimeSequenceBuffer(seq_length=args.obs_length + args.pred_length, observation_length=args.obs_length)
 
@@ -72,24 +72,21 @@ while True:
                 pedsList_seq, saved_args, frame.shape, lookup_seq,
                 first_values_dict, use_gru=args.gru, obs_grid=obs_grid
             )
+            print(f"Predicted trajectory for ID {target_id}: {ret_x_seq}")
 
             # The furthest predicted point
             x, y = ret_x_seq[-1][0].tolist()
             # scale the coordinates back to the original frame size
             pred_point = (int(x * 10), int(y * 10))
 
-            # Get the current point of the target pedestrian
-            for track in tracks:
-                if track.track_id == target_id:
-                    ltrb = track.to_ltrb()
-                    current_point = (int((ltrb[0] + ltrb[2]) / 2), int((ltrb[1] + ltrb[3]) / 2))
-                    break
-            else:
-                current_point = pred_point
+            x, y = ret_x_seq[0][0].tolist()
+            current_point = (int(x * 10), int(y * 10))
 
-            cv2.arrowedLine(frame, current_point, pred_point, (255, 0, 0), 5, tipLength=1)
+            cv2.arrowedLine(frame, current_point, pred_point, (0, 255, 255), 2, tipLength=0.5)
+            print(f"Drawing arrow from {current_point} to {pred_point} for ID {target_id}")
+            
 
-    cv2.imshow("YOLO + Social LSTM", frame)
+    # cv2.imshow("YOLO + Social LSTM", frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
