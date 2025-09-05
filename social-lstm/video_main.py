@@ -59,9 +59,9 @@ while True:
     buffer.update(ped_data)
 
     if buffer.is_ready():
-        x_seq, pedsList_seq, oldest_ids = buffer.get_sequence()
-        # Prepare the sequence for prediction, use the ids from the oldest frames
-        for target_id in oldest_ids:
+        x_seq, pedsList_seq, current_ids = buffer.get_sequence()
+        # Prepare the sequence for prediction, use the ids from the current frame
+        for target_id in current_ids:
             obs_traj, obs_PedsList_seq, obs_grid, pedsList_seq, lookup_seq, first_values_dict = prepare_sequence(
                 x_seq, pedsList_seq, saved_args, frame.shape, target_id
             )
@@ -77,9 +77,11 @@ while True:
             # The furthest predicted point
             x, y = ret_x_seq[-1][0].tolist()
             # scale the coordinates back to the original frame size
+            # this is only for testing purposes, in real application the model should predict in real-world coordinates
+            # the coordinates were scaled down by a factor of 10 before feeding into the model
             pred_point = (int(x * 10), int(y * 10))
 
-            x, y = ret_x_seq[0][0].tolist()
+            x, y = ret_x_seq[args.obs_length-1][0].tolist()
             current_point = (int(x * 10), int(y * 10))
 
             cv2.arrowedLine(frame, current_point, pred_point, (0, 255, 255), 2, tipLength=0.5)

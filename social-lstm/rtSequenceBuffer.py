@@ -50,7 +50,7 @@ class RealTimeSequenceBuffer:
             x_seq: list of np arrays, each with shape (num_oldest_ids, 3) -> [id, x, y]
                 Length is always seq_length. Missing frames are padded at the end with NaNs.
             pedsList_seq: list of lists of IDs per actual frame
-            oldest_ids: list of IDs from the oldest available frame
+            current_ids: list of IDs from the current available frame
         """
         x_seq_raw = list(self.obs_buffer)
         pedsList_seq = list(self.PedsList)
@@ -58,16 +58,16 @@ class RealTimeSequenceBuffer:
         if len(x_seq_raw) == 0:
             return [np.empty((0, 3)) for _ in range(self.seq_length)], [], []
 
-        # Use IDs from the oldest available frame
-        oldest_frame = x_seq_raw[0]
-        oldest_ids = oldest_frame[:, 0].astype(int).tolist()
+        # Use IDs from the current available frame
+        current_frame = x_seq_raw[self.observation_length - 1]
+        current_ids = current_frame[:, 0].astype(int).tolist()
 
-        # Align each frame to the oldest_ids
+        # Align each frame to the current_ids
         aligned_seq = []
         for frame in x_seq_raw:
             id_to_coords = {int(row[0]): row[1:] for row in frame}
             frame_aligned = []
-            for oid in oldest_ids:
+            for oid in current_ids:
                 if oid in id_to_coords:
                     frame_aligned.append([oid, *id_to_coords[oid]])
                 else:
@@ -77,11 +77,11 @@ class RealTimeSequenceBuffer:
         # Pad the END if needed
         num_to_pad = self.seq_length - len(aligned_seq)
         if num_to_pad > 0:
-            pad_frame = np.array([[oid, np.nan, np.nan] for oid in oldest_ids])
+            pad_frame = np.array([[oid, np.nan, np.nan] for oid in current_ids])
             aligned_seq += [pad_frame.copy() for _ in range(num_to_pad)]
 
         aligned_seq = self.convert_x_seq_format(aligned_seq)
-        return aligned_seq, pedsList_seq, oldest_ids
+        return aligned_seq, pedsList_seq, current_ids
 
     
 
