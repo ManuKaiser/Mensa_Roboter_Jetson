@@ -42,7 +42,7 @@ def prediction_step(detections, frame):
         x_center = int((ltrb[0] + ltrb[2]) / 2)
         y_center = int((ltrb[1] + ltrb[3]) / 2)
         # Collect pedestrian data and scale coordinates
-        ped_data.append([track_id, x_center / 10, y_center / 10])
+        ped_data.append([track_id, x_center, y_center])
 
         # Drawthe current bounding box and ID on the frame
         cv2.rectangle(frame, (int(ltrb[0]), int(ltrb[1])), (int(ltrb[2]), int(ltrb[3])), (0, 255, 0), 2)
@@ -77,6 +77,8 @@ def prediction_step(detections, frame):
 
             results.append((target_id, current_point, pred_point))
 
-            
-
     return results
+
+
+# Do you need the current point? Use the current point for each pedestrian after the inference has run, so the arrow starts at the correct position
+# 2 threads, one for video capture, one for inference, updating the predicted point for each id, delete if id not in frame anymore
