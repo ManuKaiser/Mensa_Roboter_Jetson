@@ -1,113 +1,72 @@
+
 import cv2
 import torch
 import numpy as np
 from ultralytics import YOLO
 from deep_sort_realtime.deepsort_tracker import DeepSort
+# from videostream import VideoStream
 from rtSequenceBuffer import RealTimeSequenceBuffer
 from model_inference import load_model, prepare_sequence, predict_trajectory
-from helper import get_args
+from helper import get_method_name, get_args
+from path_prediction import prediction_step
+import pyrealsense2 as rs
+from pixel_to_3dpoint import pixel_to_3dpoint
 
-# === Args and Models ===
 args = get_args()
-video_path = "data/V_Train_0000.mp4"  # Change this to your input video file
 
-# Load models
-yolo_model = YOLO("yolov8n.pt")  # or custom path
+# Load YOLO
+yolo_model = YOLO("yolov8n.pt")
 tracker = DeepSort(max_age=30)
+buffer = RealTimeSequenceBuffer(seq_length=args.obs_length + args.pred_length, observation_length=args.obs_length)
+
+
+pipeline = rs.pipeline()
+config = rs.config()
+config.enable_stream(rs.stream.color, 1280, 720, rs.format.bgr8, 30)
+config.enable_stream(rs.stream.depth, 1280, 720, rs.format.z16, 30)
+
+profile = pipeline.start(config)
+
+# Get the color stream intrinsics
+color_stream = profile.get_stream(rs.stream.color).as_video_stream_profile()
+intr = color_stream.get_intrinsics()
+
+z_floor = -1.0  # Hight of the floor in meters, relativ to the camera
+
+
+# Load LSTM
 model, saved_args = load_model(args.method, "LSTM", args.epoch)
 
-# Video input
-cap = cv2.VideoCapture(video_path)
-width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-fps = cap.get(cv2.CAP_PROP_FPS)
+while True:
+    # Get frame from the video stream
+    frameset = pipeline.wait_for_frames()
+    color_frame = frameset.get_color_frame()
+    depthframe = frameset.get_depth_frame()
 
-# Video output (optional)
-save_output = True
-if save_output:
-    out = cv2.VideoWriter("output_prediction.mp4", cv2.VideoWriter_fourcc(*'mp4v'), fps, (width, height))
-
-# Trajectory buffer
-buffer = RealTimeSequenceBuffer(seq_length=args.obs_length + args.pred_length,
-                                observation_length=args.obs_length)
-
-
-# === Processing loop ===
-while cap.isOpened():
-    ret, frame = cap.read()
-    if not ret:
-        break
-
-    # YOLO detection
-    results = yolo_model(frame)
+    frame = np.asanyarray(color_frame.get_data())
+    
+    # Run YOLO detection
+    results = yolo_model(frame, verbose=False)
     detections = []
-
-    conf_threshold = 0.6  # Adjust as needed
 
     for det in results[0].boxes.data.cpu().numpy():
         x1, y1, x2, y2, conf, cls = det
-        if int(cls) == 0 and conf > conf_threshold:
+        if int(cls) == 0:
             detections.append(([x1, y1, x2 - x1, y2 - y1], conf))
 
-
-    # Track people
+        # Update DeepSort tracker
     tracks = tracker.update_tracks(detections, frame=frame)
-    ped_data = []
 
+    ped_data = []
     for track in tracks:
         if not track.is_confirmed():
             continue
         track_id = track.track_id
-        ltrb = track.to_ltrb()
-        x_center = int((ltrb[0] + ltrb[2]) / 2)
-        y_center = int((ltrb[1] + ltrb[3]) / 2)
-        ped_data.append([track_id, x_center / 10, y_center / 10])
+        ltrb = track.to_ltrb() 
+        x_person = int((ltrb[0] + ltrb[2]) / 2)
+        y_person = int((ltrb[1] + ltrb[3]) / 2)
 
-        cv2.rectangle(frame, (int(ltrb[0]), int(ltrb[1])), (int(ltrb[2]), int(ltrb[3])), (0, 255, 0), 2)
-        cv2.putText(frame, f"ID {track_id}", (int(ltrb[0]), int(ltrb[1]) - 10),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-        cv2.circle(frame, (x_center, y_center), 5, (0, 0, 255), -1)
+        x, y, z = pixel_to_3dpoint(u=x_person, v=y_person, intr=intr, depth_frame=depthframe)
+        ped_data.append([track_id, x, z])
 
-    buffer.update(ped_data)
-
-    # Predict trajectory
-    if buffer.is_ready():
-        x_seq, pedsList_seq, oldest_ids = buffer.get_sequence()
-        for target_id in oldest_ids:
-            obs_traj, obs_PedsList_seq, obs_grid, pedsList_seq, lookup_seq, first_values_dict = prepare_sequence(
-                x_seq, pedsList_seq, saved_args, args, frame.shape, target_id
-            )
-
-            ret_x_seq = predict_trajectory(
-                model, obs_traj, obs_PedsList_seq, args,
-                pedsList_seq, saved_args, frame.shape, lookup_seq,
-                first_values_dict, use_gru=args.gru, obs_grid=obs_grid
-            )
-
-            x, y = ret_x_seq[-1][0].tolist()
-            pred_point = (int(x * 10), int(y * 10))
-
-            for track in tracks:
-                if track.track_id == target_id:
-                    ltrb = track.to_ltrb()
-                    current_point = (int((ltrb[0] + ltrb[2]) / 2), int((ltrb[1] + ltrb[3]) / 2))
-                    break
-            else:
-                current_point = pred_point
-
-            cv2.arrowedLine(frame, current_point, pred_point, (255, 0, 0), 5, tipLength=0.4)
-            cv2.line(frame, current_point, pred_point, (255, 0, 0), 5)
-
-    # Show and/or save
-    cv2.imshow("Trajectory Prediction", frame)
-    if save_output:
-        out.write(frame)
-
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-
-# === Cleanup ===
-cap.release()
-if save_output:
-    out.release()
-cv2.destroyAllWindows()
+        print(f"ID {track_id}: Pixel ({x_person}, {y_person}) -> 3D point ({x:.2f}, {y:.2f}, {z:.2f})")

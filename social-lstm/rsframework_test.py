@@ -31,7 +31,7 @@ u, v = int(pixel[0]), int(pixel[1])
 print(f"Pixel coordinates: ({u}, {v})")
 
 
-u, v = 640, 360
+u, v = 300, 360
 
 def pixel_to_camera(u=None, v=None, depth=None, intr=None, depth_frame=None):
     """
@@ -67,30 +67,6 @@ def pixel_to_camera(u=None, v=None, depth=None, intr=None, depth_frame=None):
     return np.array(point)  # [X, Y, Z]
 
 
-def camera_to_robot(point_camera, R=None, t=None):
-    """
-    Transformiert einen Punkt von Kamera- zu Roboterkoordinaten.
-
-    Args:
-        point_camera (np.ndarray): [X, Y, Z] im Kamera-Koordinatensystem.
-        R (np.ndarray): 3x3 Rotationsmatrix Kamera->Roboter.
-        t (np.ndarray): 3x1 Translation Kamera->Roboter.
-
-    Returns:
-        np.ndarray: [X, Y, Z] im Roboter-Koordinatensystem.
-    """
-    # Default: Kamera 20cm über Boden, gerade nach vorne
-    if R is None:
-        R = np.array([
-            [0, 0, 1],   # Kamera-Z -> Roboter-X
-            [-1, 0, 0],  # Kamera-X -> -Roboter-Y
-            [0, -1, 0]   # Kamera-Y -> -Roboter-Z
-        ])
-    if t is None:
-        t = np.array([0.0, 0.0, 0.2])  # Kamera 20cm über Boden
-
-    point_robot = R @ point_camera + t
-    return point_robot
 
 
 
