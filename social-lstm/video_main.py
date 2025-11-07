@@ -55,7 +55,7 @@ while True:
 
     for det in results[0].boxes.data.cpu().numpy():
         x1, y1, x2, y2, conf, cls = det
-        if int(cls) == 0 and conf > 0.5:
+        if int(cls) == 0 and conf > 0.6:
             detections.append(([x1, y1, x2 - x1, y2 - y1], conf))
 
         # Update DeepSort tracker
@@ -116,7 +116,7 @@ while True:
             print(f"Drawing arrow from {current_point} to {pred_point} for ID {target_id}")
             
 
-    # cv2.imshow("YOLO + Social LSTM", frame)
+    cv2.imshow("YOLO + Social LSTM", frame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
