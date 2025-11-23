@@ -38,17 +38,9 @@ def prediction_step(ped_data, frame):
                 first_values_dict, use_gru=args.gru, obs_grid=obs_grid
             )
 
-            # print(f"Predicted trajectory for ID {target_id}: {ret_x_seq}")
+            predicted_array = [p[0].tolist() for p in ret_x_seq[-13:]]
 
-            # The furthest predicted point
-            x, y = ret_x_seq[-1][0].tolist()
-            pred_point = (x, y)
-
-            # The current point (last observed point)
-            x, y = ret_x_seq[args.obs_length-1][0].tolist()
-            current_point = (x, y)
-
-            results.append((target_id, current_point, pred_point))
+            results.append((target_id, predicted_array))
 
     return results
 
