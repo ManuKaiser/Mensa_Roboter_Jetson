@@ -6,108 +6,103 @@ class ShmPredictionWriter:
     """
     Writes 3D prediction results to shared memory in a compact binary struct format.
 
-    Layout:
+    Correct layout (matching ROS reader):
         int32 num_targets
         For each target:
+            int32 person_id
             int32 num_points
             repeated (float32 x, float32 y, float32 z)
     """
 
     def __init__(self, name="predictions_shm",
-                 max_targets=20,
-                 max_points_per_target=20):
+                 max_targets=10,
+                 max_points_per_target=15):
 
         self.name = name
         self.max_targets = max_targets
         self.max_points_per_target = max_points_per_target
 
-        # Compute maximum bytes needed:
-        # num_targets (4)
-        # per target: num_points (4) + points * 12 bytes
-        self.max_bytes = (
-            4 + max_targets * (4 + max_points_per_target * 12)
-        )
+        # Compute maximum size:
+        # num_targets (4 bytes)
+        # each target: person_id (4) + num_points (4) + points * 12
+        self.max_bytes = 4 + max_targets * (4 + 4 + max_points_per_target * 12)
 
-        # Create or attach shared memory
         try:
-            self.shm = shared_memory.SharedMemory(name=self.name, create=True,
-                                                  size=self.max_bytes)
+            self.shm = shared_memory.SharedMemory(name=name, create=True, size=self.max_bytes)
             self.existing = False
         except FileExistsError:
-            self.shm = shared_memory.SharedMemory(name=self.name, create=False)
+            self.shm = shared_memory.SharedMemory(name=name, create=False)
             self.existing = True
 
         self.buf = self.shm.buf
 
-    # ------------------------------------------------------------
+    # ----------------------------------------------------------------------------------
 
     def write(self, predictions):
         """
-        predictions must be a list of:
+        predictions must be a list of dicts:
             {
-                "target_id": ...,
-                "points": [(x,y,z), (x,y,z), ...]
+                "target_id": int,
+                "points": [(x,y,z), ...]
             }
         """
 
         offset = 0
 
         num_targets = min(len(predictions), self.max_targets)
-
-        # Write number of targets
         struct.pack_into("i", self.buf, offset, num_targets)
         offset += 4
 
         for i in range(num_targets):
 
+            target_id = int(predictions[i]["target_id"])
             pts = predictions[i]["points"]
 
-            # ------------------------------------------------------
-            # SAFE FILTERING FOR 3D POINTS
-            # ------------------------------------------------------
+            # ------------------------------
+            # 1. WRITE PERSON ID
+            # ------------------------------
+            struct.pack_into("i", self.buf, offset, target_id)
+            offset += 4
+
+            # ------------------------------
+            # Filter & clean points
+            # ------------------------------
             safe_pts = []
             for p in pts:
-
-                # Must be indexable with ≥3 values
                 if not hasattr(p, "__getitem__") or len(p) < 3:
                     continue
 
-                x, y, z = p[0], p[1], p[2]
+                x, y, z = float(p[0]), float(p[1]), float(p[2])
 
-                # Must be finite numeric values
-                if not (
-                    np.isfinite(x) and np.isfinite(y) and np.isfinite(z)
-                ):
+                if not (np.isfinite(x) and np.isfinite(y) and np.isfinite(z)):
                     continue
 
-                # Convert to float32 safely
-                try:
-                    xf = float(x)
-                    yf = float(y)
-                    zf = float(z)
-                except Exception:
-                    continue
-
-                safe_pts.append((xf, yf, zf))
-
+                safe_pts.append((x, y, z))
                 if len(safe_pts) >= self.max_points_per_target:
                     break
 
-            # ------------------------------------------------------
-            # WRITE NUMBER OF SAFE POINTS
-            # ------------------------------------------------------
-            n = len(safe_pts)
-            struct.pack_into("i", self.buf, offset, n)
+            num_points = len(safe_pts)
+
+            # ------------------------------
+            # 2. WRITE num_points
+            # ------------------------------
+            struct.pack_into("i", self.buf, offset, num_points)
             offset += 4
 
-            # ------------------------------------------------------
-            # WRITE POINTS (float32 x, y, z)
-            # ------------------------------------------------------
-            for (xf, yf, zf) in safe_pts:
-                struct.pack_into("fff", self.buf, offset, xf, yf, zf)
+            # ------------------------------
+            # 3. WRITE POINT DATA
+            # ------------------------------
+            for (x, y, z) in safe_pts:
+
+                # Safety check (prevent buffer overflow)
+                if offset + 12 > self.max_bytes:
+                    print("WARNING: SHM buffer overflow prevented.")
+                    return
+
+                struct.pack_into("fff", self.buf, offset, x, y, z)
                 offset += 12
 
-    # ------------------------------------------------------------
+    # ----------------------------------------------------------------------------------
 
     def close(self):
         self.shm.close()

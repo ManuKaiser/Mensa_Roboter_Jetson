@@ -4,13 +4,13 @@ import torch
 import numpy as np
 from ultralytics import YOLO
 from deep_sort_realtime.deepsort_tracker import DeepSort
-# from videostream import VideoStream
 from rtSequenceBuffer import RealTimeSequenceBuffer
 from model_inference import load_model, prepare_sequence, predict_trajectory
 from helper import get_method_name, get_args
 from path_prediction import prediction_step
 import pyrealsense2 as rs
 from pixel_to_3dpoint import pixel_to_3dpoint
+
 from multiprocessing import shared_memory
 import struct
 from shm_writer import ShmPredictionWriter
@@ -39,7 +39,7 @@ profile = pipeline.start(config)
 color_stream = profile.get_stream(rs.stream.color).as_video_stream_profile()
 intr = color_stream.get_intrinsics()
 
-y_floor = 0.0  # Hight of the floor in meters, relativ to the camera, remember direction of the y axis
+y_floor = 0.4  # Hight of the floor in meters, relativ to the camera, remember direction of the y axis
 
 writer = ShmPredictionWriter(
     name="predictions_shm",
@@ -94,8 +94,6 @@ try:
                 continue  # Skip invalid points
             ped_data.append([track_id, x, z])
 
-            print(f"ID {track_id}: Pixel ({x_person}, {y_person}) -> 3D point ({x:.2f}, {y:.2f}, {z:.2f})")
-
             # Drawthe current bounding box and ID on the frame
             cv2.rectangle(frame, (int(ltrb[0]), int(ltrb[1])), (int(ltrb[2]), int(ltrb[3])), (0, 255, 0), 2)
             cv2.putText(frame, f"ID {track_id}", (int(ltrb[0]), int(ltrb[1]) - 10),
@@ -137,16 +135,29 @@ try:
             })
 
 
-            current_point = converted_pixel_points[0]
-            pred_point = converted_pixel_points[-1]
+            # Base color (bright yellow)
+            start_color = np.array([0, 255, 255], dtype=np.float32)
 
+            num_points = len(converted_pixel_points)
 
-            # Only draw if both points are within the image
-            if (0 <= current_point[0] < intr.width and 0 <= current_point[1] < intr.height and
-                0 <= pred_point[0] < intr.width and 0 <= pred_point[1] < intr.height):
-                cv2.arrowedLine(frame, current_point, pred_point, (0, 255, 255), 2, tipLength=0.5)
-                print(f"Drawing arrow from {current_point} to {pred_point} for ID {target_id}")
-                
+            for i in range(num_points - 1):
+                p1 = converted_pixel_points[i]
+                p2 = converted_pixel_points[i+1]
+
+                # Fade factor: 1 → 0 from first point to last
+                fade = 1 - (i / (num_points - 1))
+
+                # Apply fade to color
+                color = (start_color * fade).astype(int).tolist()  # Convert to int BGR
+
+                # Validate points are inside the frame
+                if (0 <= p1[0] < intr.width and 0 <= p1[1] < intr.height and
+                    0 <= p2[0] < intr.width and 0 <= p2[1] < intr.height):
+
+                    cv2.line(frame, p1, p2, color, 2)
+                    cv2.circle(frame, p1, 3, color, -1)
+
+          
 
         shm_image.buf[:frame.size] = frame.tobytes()
         writer.write(predictions)

@@ -1,1 +1,1 @@
-Validation dataset Best epoch: 23, Best validation Loss: -2.206695075954001
+Validation dataset Best epoch: 8, Best validation Loss: 1.4035198783823126
