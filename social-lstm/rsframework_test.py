@@ -1,80 +1,32 @@
 import pyrealsense2 as rs
-import numpy as np
 
 pipeline = rs.pipeline()
 config = rs.config()
-config.enable_stream(rs.stream.color, 1280, 720, rs.format.bgr8, 30)
-config.enable_stream(rs.stream.depth, 1280, 720, rs.format.z16, 30)
 
-profile = pipeline.start(config)
+config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
+config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
 
-# Get the color stream intrinsics
-color_stream = profile.get_stream(rs.stream.color).as_video_stream_profile()
-intr = color_stream.get_intrinsics()
+started = False
 
-print("Intrinsics:")
-print("  width:", intr.width)
-print("  height:", intr.height)
-print("  fx:", intr.fx)
-print("  fy:", intr.fy)
-print("  ppx:", intr.ppx)
-print("  ppy:", intr.ppy)
-print("  distortion:", intr.model)
-print("  coeffs:", intr.coeffs)
+try:
+    profile = pipeline.start(config)
+    started = True
 
+    color_stream = profile.get_stream(rs.stream.color).as_video_stream_profile()
+    intr = color_stream.get_intrinsics()
 
-point_3d = [0.2, 0.1, 2.0]  # X=0.2m right, Y=0.1m down, Z=2.0m forward
+    print("Color camera intrinsics:")
+    print(f"  Resolution: {intr.width} x {intr.height}")
+    print(f"  fx: {intr.fx}")
+    print(f"  fy: {intr.fy}")
+    print(f"  ppx: {intr.ppx}")
+    print(f"  ppy: {intr.ppy}")
+    print(f"  Distortion model: {intr.model}")
+    print(f"  Coefficients: {intr.coeffs}")
 
-pixel = rs.rs2_project_point_to_pixel(intr, point_3d)
-u, v = int(pixel[0]), int(pixel[1])
+except RuntimeError as e:
+    print("RealSense error:", e)
 
-print(f"Pixel coordinates: ({u}, {v})")
-
-
-u, v = 300, 360
-
-def pixel_to_camera(u=None, v=None, depth=None, intr=None, depth_frame=None):
-    """
-    Wandelt Pixelkoordinaten (u, v) + Tiefe in Kamerakoordinaten (X, Y, Z) um.
-
-    Args:
-        u, v (int): Pixelkoordinaten.
-        depth (float): Tiefe in Metern an diesem Pixel.
-        intr (rs.intrinsics): Kameraintrinsics.
-        depth_frame (rs.depth_frame): Optionales Depth Frame, falls depth/intr fehlen.
-
-    Returns:
-        np.ndarray: [X, Y, Z] in Metern im Kamera-Koordinatensystem.
-    """
-    if depth_frame is None and (depth is None or intr is None):
-        raise ValueError("Entweder depth+intr oder depth_frame muss übergeben werden.")
-
-    # Falls Intrinsics fehlen, aus depth_frame holen
-    if intr is None:
-        intr = depth_frame.profile.as_video_stream_profile().get_intrinsics()
-
-    # Falls Tiefe fehlt, vom Depth Frame holen
-    if depth is None:
-        if u is None or v is None:
-            raise ValueError("Pixelkoordinaten (u, v) müssen angegeben werden, wenn depth fehlt.")
-        depth = depth_frame.get_distance(u, v)
-
-    # Falls Pixelkoordinaten fehlen, nehme Bildmitte
-    if u is None or v is None:
-        u, v = intr.width // 2, intr.height // 2
-
-    point = rs.rs2_deproject_pixel_to_point(intr, [u, v], depth)
-    return np.array(point)  # [X, Y, Z]
-
-
-
-
-
-while True:
-    # This call waits until a new coherent set of frames is available on a device
-    # Calls to get_frame_data(...) and get_frame_timestamp(...) on a device will return stable values until wait_for_frames(...) is called
-    frames = pipeline.wait_for_frames()
-    depthframe = frames.get_depth_frame()
-    print(pixel_to_camera(u=u, v=v, depth=None, intr=intr, depth_frame=depthframe))
-
-    
+finally:
+    if started:
+        pipeline.stop()

@@ -34,6 +34,9 @@ def load_model(method, model_name, epoch, base_dir=None):
 def prepare_sequence(x_seq, pedsList_seq, saved_args, dimensions, target_id):
     from helper import clean_test_data, clean_ped_list, convert_proper_array, vectorize_seq
 
+    assert isinstance(x_seq, list), "x_seq must be a fresh copy per call"
+
+
     obs_length = saved_args.seq_length - saved_args.pred_length
     seq_length = saved_args.seq_length
 

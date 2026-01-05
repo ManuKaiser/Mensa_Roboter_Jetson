@@ -1,15 +1,14 @@
 import cv2
 import torch
 import numpy as np
-from ultralytics import YOLO
 from deep_sort_realtime.deepsort_tracker import DeepSort
 from rtSequenceBuffer import RealTimeSequenceBuffer
 from model_inference import load_model, prepare_sequence, predict_trajectory
 from helper import get_method_name, get_args
 from path_prediction import prediction_step
 import pyrealsense2 as rs
-from pixel_to_3dpoint import pixel_to_3dpoint, pixel_to_3dpoint_median
-import time
+from pixel_to_3dpoint import pixel_to_3dpoint
+import math
 
 from multiprocessing import shared_memory
 import struct
@@ -17,24 +16,17 @@ from shm_writer import ShmPredictionWriter
 
 
 
-TARGET_FPS = 10
-FRAME_INTERVAL = 1.0 / TARGET_FPS
-last_time = 0
-FRAME_WIDTH = 640
-FRAME_HEIGHT = 480
 
 args = get_args()
 
-# Load YOLO
-yolo_model = YOLO("yolov8n.pt")
-tracker = DeepSort(max_age=20)
+tracker = DeepSort(max_age=30)
 buffer = RealTimeSequenceBuffer(seq_length=args.obs_length + args.pred_length, observation_length=args.obs_length)
 
 
 pipeline = rs.pipeline()
 config = rs.config()
-config.enable_stream(rs.stream.color, FRAME_WIDTH, FRAME_HEIGHT, rs.format.bgr8, 30)
-config.enable_stream(rs.stream.depth, FRAME_WIDTH, FRAME_HEIGHT, rs.format.z16, 30)
+config.enable_stream(rs.stream.color, 1280, 720, rs.format.bgr8, 10)
+config.enable_stream(rs.stream.depth, 1280, 720, rs.format.z16, 10)
 
 align_to = rs.stream.color
 align = rs.align(align_to)
@@ -45,47 +37,44 @@ profile = pipeline.start(config)
 color_stream = profile.get_stream(rs.stream.color).as_video_stream_profile()
 intr = color_stream.get_intrinsics()
 
-y_floor = 0.4  # Height from the floor to the camera in meters
+y_floor = 0.4  # Hight of the floor in meters, relativ to the camera, remember direction of the y axis
 
-writer = ShmPredictionWriter(
-    name="predictions_shm",
-    max_targets=10,
-    max_points_per_target=15
-)
+framecounter = 0
 
-shm_image = shared_memory.SharedMemory(name='mensa_robot_shared_memory_image', create=True, size=FRAME_WIDTH*FRAME_HEIGHT*3)
+
+
+# Load LSTM
+model, saved_args = load_model(args.method, "LSTM", args.epoch)
 
 try:
     while True:
         # Get frame from the video stream
         frameset = pipeline.wait_for_frames()
-
-        now = time.time()
-        timestamp = time.time_ns()
-
-        if now - last_time < FRAME_INTERVAL:
-            continue
-
-        last_time = now
-
         aligned_frames = align.process(frameset)
         color_frame = aligned_frames.get_color_frame()
         depth_frame = aligned_frames.get_depth_frame()
 
 
         frame = np.asanyarray(color_frame.get_data())
+
+        angle = framecounter * math.pi / 20
+        x1 = 200 + 50 * math.cos(angle)
+        y1 = 200 + 50 * math.sin(angle)
         
-        # Run YOLO detection
-        results = yolo_model(frame, verbose=False)
+        det_results = [(x1 , y1, 20, 20, 0.8, 0), (400 + x1, 200 + y1, 20, 20, 0.8, 0)]
+
+
+
         detections = []
 
-        for det in results[0].boxes.data.cpu().numpy():
-            x1, y1, x2, y2, conf, cls = det
-            if int(cls) == 0 and conf > 0.6:
-                detections.append(([x1, y1, x2 - x1, y2 - y1], conf))
-
-            # Update DeepSort tracker
+        for det in det_results:
             
+            x1, y1, x2, y2, conf, cls = det
+
+            if int(cls) == 0 and conf > 0.6:
+                detections.append(([x1, y1, 50, 50], conf))
+
+        print(detections)
         tracks = tracker.update_tracks(detections, frame=frame)
 
         ped_data = []
@@ -97,17 +86,8 @@ try:
             x_person = int((ltrb[0] + ltrb[2]) / 2)
             y_person = int((ltrb[1] + ltrb[3]) / 2)
 
-            if not (0 <= x_person < intr.width and 0 <= y_person < intr.height):
-                continue
-
-            # x, y, z = pixel_to_3dpoint(u=x_person, v=y_person, intr=intr, depth_frame=depth_frame)
-
-            x, y, z = pixel_to_3dpoint_median(u=x_person, v=y_person, intr=intr, depth_frame=depth_frame, h=FRAME_HEIGHT, w=FRAME_WIDTH, r=10)
-            #print(f"X: {x}, Y: {y}, Z: {z}")
+            ped_data.append([track_id, x_person/100, y_person/100])
             
-            if (x, y, z) == (0.0, 0.0, 0.0):    
-                continue  # Skip invalid points
-            ped_data.append([track_id, x, z])
 
             # Drawthe current bounding box and ID on the frame
             cv2.rectangle(frame, (int(ltrb[0]), int(ltrb[1])), (int(ltrb[2]), int(ltrb[3])), (0, 255, 0), 2)
@@ -115,6 +95,8 @@ try:
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
             cv2.circle(frame, (x_person, y_person), 5, (0, 0, 255), -1)        
 
+
+        print(ped_data)
         results = prediction_step(ped_data, frame)
         # print(f"Prediction results: {results}")
         predictions = []
@@ -127,7 +109,7 @@ try:
             for p in predicted_array:
                 p3d = (p[0], y_floor, p[1])
                 real_world_points.append(p3d)
-                px = rs.rs2_project_point_to_pixel(intr, p3d)
+                px = (p[0]*100,  p[1]*100)
 
                 if px is None:
                     continue
@@ -172,12 +154,11 @@ try:
                     cv2.line(frame, p1, p2, color, 2)
                     cv2.circle(frame, p1, 3, color, -1)
 
-          
+            framecounter += 1
 
-        shm_image.buf[:frame.size] = frame.tobytes()
-        writer.write(predictions, timestamp)
+
+
         cv2.imshow("YOLO + Social LSTM", frame)
-
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
@@ -185,9 +166,3 @@ try:
 finally:
     pipeline.stop()
     cv2.destroyAllWindows()
-
-    shm_image.close()
-    shm_image.unlink()
-
-    writer.close()
-    writer.unlink()

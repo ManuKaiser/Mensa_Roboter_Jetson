@@ -22,10 +22,7 @@ class ShmPredictionWriter:
         self.max_targets = max_targets
         self.max_points_per_target = max_points_per_target
 
-        # Compute maximum size:
-        # num_targets (4 bytes)
-        # each target: person_id (4) + num_points (4) + points * 12
-        self.max_bytes = 4 + max_targets * (4 + 4 + max_points_per_target * 12)
+        self.max_bytes = 4 + 8 + max_targets * (4 + 4 + max_points_per_target * 12)
 
         try:
             self.shm = shared_memory.SharedMemory(name=name, create=True, size=self.max_bytes)
@@ -38,7 +35,7 @@ class ShmPredictionWriter:
 
     # ----------------------------------------------------------------------------------
 
-    def write(self, predictions):
+    def write(self, predictions, timestamp):
         """
         predictions must be a list of dicts:
             {
@@ -52,6 +49,9 @@ class ShmPredictionWriter:
         num_targets = min(len(predictions), self.max_targets)
         struct.pack_into("i", self.buf, offset, num_targets)
         offset += 4
+
+        struct.pack_into("q", self.buf, offset, timestamp)
+        offset += 8
 
         for i in range(num_targets):
 

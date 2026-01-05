@@ -45,13 +45,7 @@ class RealTimeSequenceBuffer:
 
 
     def get_sequence(self):
-        """
-        Returns:
-            x_seq: list of np arrays, each with shape (num_oldest_ids, 3) -> [id, x, y]
-                Length is always seq_length. Missing frames are padded at the end with NaNs.
-            pedsList_seq: list of lists of IDs per actual frame
-            current_ids: list of IDs from the current available frame
-        """
+
         x_seq_raw = list(self.obs_buffer)
         pedsList_seq = list(self.PedsList)
 

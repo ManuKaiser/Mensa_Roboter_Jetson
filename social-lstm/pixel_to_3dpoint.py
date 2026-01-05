@@ -2,34 +2,79 @@ import pyrealsense2 as rs
 import numpy as np
 
 def pixel_to_3dpoint(u=None, v=None, depth=None, intr=None, depth_frame=None):
+
     """
-    Wandelt Pixelkoordinaten (u, v) + Tiefe in Kamerakoordinaten (X, Y, Z) um.
+    Calculates the 3D point corresponding to a given pixel coordinate (u, v)
+    in a depth frame.
 
-    Args:
-        u, v (int): Pixelkoordinaten.
-        depth (float): Tiefe in Metern an diesem Pixel.
-        intr (rs.intrinsics): Kameraintrinsics.
-        depth_frame (rs.depth_frame): Optionales Depth Frame, falls depth/intr fehlen.
+    Parameters
+    ----------
+    u : int
+    v : int
+    depth : float, optional
+        Depth value at the given pixel coordinate. Must be given if depth_frame is None.
+    intr : rs.intrinsics, optional
+        Intrinsics of the depth frame. Must be given if depth_frame is None.
+    depth_frame : rs.depth_frame, optional
+        Depth frame containing the depth value at the given pixel coordinate.
 
-    Returns:
-        np.ndarray: [X, Y, Z] in Metern im Kamera-Koordinatensystem.
+    Returns
+    -------
+    point : numpy.array
+        3D point [X, Y, Z] corresponding to the given pixel coordinate.
+
+    Raises
+    -------
+    ValueError
+        If neither depth+intr nor depth_frame is given, or if the pixel coordinates (u, v) are None.
     """
     if depth_frame is None and (depth is None or intr is None):
         raise ValueError("Entweder depth+intr oder depth_frame muss übergeben werden.")
 
-    # Falls Intrinsics fehlen, aus depth_frame holen
     if intr is None:
         intr = depth_frame.profile.as_video_stream_profile().get_intrinsics()
 
-    # Falls Tiefe fehlt, vom Depth Frame holen
-    if depth is None:
-        if u is None or v is None:
-            raise ValueError("Pixelkoordinaten (u, v) müssen angegeben werden, wenn depth fehlt.")
-        depth = depth_frame.get_distance(u, v)
-
-    # Falls Pixelkoordinaten fehlen, nehme Bildmitte
     if u is None or v is None:
-        u, v = intr.width // 2, intr.height // 2
+        raise ValueError("Pixelkoordinaten (u, v) muss angegeben werden.")
+
+    if depth is None:
+        depth = depth_frame.get_distance(u, v)
+    
+
+    point = rs.rs2_deproject_pixel_to_point(intr, [u, v], depth)
+    return np.array(point)  # [X, Y, Z]
+
+
+def pixel_to_3dpoint_median(u=None, v=None, intr=None, depth_frame=None, h=None, w=None, r=None):
+
+
+    if depth_frame is None and (depth is None or intr is None):
+        raise ValueError("Entweder depth+intr oder depth_frame muss übergeben werden.")
+
+    if intr is None:
+        intr = depth_frame.profile.as_video_stream_profile().get_intrinsics()
+
+    if u is None or v is None:
+        raise ValueError("Pixelkoordinaten (u, v) muss angegeben werden.")
+
+    depths = []
+
+    for dv in range(-r, r + 1):
+        for du in range(-r, r + 1):
+            uu = u + du
+            vv = v + dv
+
+            # Bounds check
+            if 0 <= uu < w and 0 <= vv < h:
+                d = depth_frame.get_distance(uu, vv)
+                if d > 0:  # ignore invalid depth
+                    depths.append(d)
+
+    if len(depths) == 0:
+        return (0.0, 0.0, 0.0)
+
+    depth = np.median(depths)
+    
 
     point = rs.rs2_deproject_pixel_to_point(intr, [u, v], depth)
     return np.array(point)  # [X, Y, Z]
