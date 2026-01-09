@@ -1,5 +1,0 @@
-[user]
-	email = manuel.kaiser.2@gmx.de
-	name = ManuKaiser
-[credential]
-	helper = "!f() { /root/.vscode-server/bin/bf9252a2fb45be6893dd8870c0bf37e2e1766d61/node /tmp/vscode-remote-containers-d1dc7857-885d-460d-a0c1-5f8f326f9a8b.js git-credential-helper $*; }; f"
