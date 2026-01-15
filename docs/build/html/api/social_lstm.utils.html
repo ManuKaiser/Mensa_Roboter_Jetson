@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>social_lstm.utils package &#8212; Mensa Roboter 26.01.2026 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=27fed22d" />
+    <script src="../_static/documentation_options.js?v=ce1ed9bf"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="social_lstm.training package" href="social_lstm.training.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="social-lstm-utils-package">
+<h1>social_lstm.utils package<a class="headerlink" href="#social-lstm-utils-package" title="Link to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
+<section id="social-lstm-utils-generator-module">
+<h2>social_lstm.utils.generator module<a class="headerlink" href="#social-lstm-utils-generator-module" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-social_lstm.utils.grid">
+<span id="social-lstm-utils-grid-module"></span><h2>social_lstm.utils.grid module<a class="headerlink" href="#module-social_lstm.utils.grid" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.grid.getGridMask">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.grid.</span></span><span class="sig-name descname"><span class="pre">getGridMask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimensions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_person</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neighborhood_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_occupancy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.grid.getGridMask" title="Link to this definition">¶</a></dt>
+<dd><p>Computes binary occupancy masks for each pedestrian’s neighborhood.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.grid.getSequenceGridMask">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.grid.</span></span><span class="sig-name descname"><span class="pre">getSequenceGridMask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimensions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pedlist_seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neighborhood_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">using_cuda</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_occupancy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.grid.getSequenceGridMask" title="Link to this definition">¶</a></dt>
+<dd><p>Get the grid masks for all the frames in the sequence
+params:
+sequence : A numpy matrix of shape SL x MNP x 3
+dimensions : This will be a list [width, height]
+neighborhood_size : Scalar value representing the size of neighborhood considered
+grid_size : Scalar value representing the size of the grid discretization
+using_cuda: Boolean value denoting if using GPU or not
+is_occupancy: A flag using for calculation of accupancy map</p>
+</dd></dl>
+
+</section>
+<section id="module-social_lstm.utils.helper">
+<span id="social-lstm-utils-helper-module"></span><h2>social_lstm.utils.helper module<a class="headerlink" href="#module-social_lstm.utils.helper" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.helper.Gaussian2DLikelihood">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.helper.</span></span><span class="sig-name descname"><span class="pre">Gaussian2DLikelihood</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodesPresent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">look_up</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.helper.Gaussian2DLikelihood" title="Link to this definition">¶</a></dt>
+<dd><p>params:
+outputs : predicted locations
+targets : true locations
+assumedNodesPresent : Nodes assumed to be present in each frame in the sequence
+nodesPresent : True nodes present in each frame in the sequence
+look_up : lookup table for determining which ped is in which array index</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.helper.Gaussian2DLikelihoodInference">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.helper.</span></span><span class="sig-name descname"><span class="pre">Gaussian2DLikelihoodInference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodesPresent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">look_up</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.helper.Gaussian2DLikelihoodInference" title="Link to this definition">¶</a></dt>
+<dd><p>Computes the likelihood of predicted locations under a bivariate Gaussian distribution at test time</p>
+<p>Parameters:</p>
+<p>outputs: Torch variable containing tensor of shape seq_length x numNodes x 1 x output_size
+targets: Torch variable containing tensor of shape seq_length x numNodes x 1 x input_size
+nodesPresent : A list of lists, of size seq_length. Each list contains the nodeIDs that are present in the frame</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="social_lstm.utils.helper.WriteOnceDict">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">social_lstm.utils.helper.</span></span><span class="sig-name descname"><span class="pre">WriteOnceDict</span></span><a class="headerlink" href="#social_lstm.utils.helper.WriteOnceDict" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.helper.add_file_extention">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.helper.</span></span><span class="sig-name descname"><span class="pre">add_file_extention</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extention</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.helper.add_file_extention" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.helper.angle_between">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.helper.</span></span><span class="sig-name descname"><span class="pre">angle_between</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.helper.angle_between" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.helper.clean_ped_list">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.helper.</span></span><span class="sig-name descname"><span class="pre">clean_ped_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pedlist_seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seq_length</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.helper.clean_ped_list" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.helper.clean_test_data">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.helper.</span></span><span class="sig-name descname"><span class="pre">clean_test_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_length</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.helper.clean_test_data" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.helper.clear_folder">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.helper.</span></span><span class="sig-name descname"><span class="pre">clear_folder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.helper.clear_folder" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.helper.convert_proper_array">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.helper.</span></span><span class="sig-name descname"><span class="pre">convert_proper_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pedlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seq_length</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.helper.convert_proper_array" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.helper.create_directories">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.helper.</span></span><span class="sig-name descname"><span class="pre">create_directories</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_folder_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.helper.create_directories" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.helper.delete_file">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.helper.</span></span><span class="sig-name descname"><span class="pre">delete_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.helper.delete_file" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.helper.getCoef">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.helper.</span></span><span class="sig-name descname"><span class="pre">getCoef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outputs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.helper.getCoef" title="Link to this definition">¶</a></dt>
+<dd><p>Extracts the mean, standard deviation and correlation
+params:
+outputs : Output of the SRNN model</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.helper.get_all_file_names">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.helper.</span></span><span class="sig-name descname"><span class="pre">get_all_file_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.helper.get_all_file_names" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.helper.get_args">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.helper.</span></span><span class="sig-name descname"><span class="pre">get_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.helper.get_args" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the parsed arguments.</p>
+<p>Parameters:
+- input_size (int): size of input data (default: 2)
+- output_size (int): size of output data (default: 5)
+- rnn_size (int): size of RNNs (default: 128)
+- embedding_size (int): size of embedding layer (default: 64)
+- grid_size (int): size of grid (default: 4)
+- maxNumPeds (int): maximum number of pedestrians in a frame (default: 27)
+- dropout (float): dropout rate for RNNs (default: 0.5)
+- use_cuda (bool): whether to use CUDA or not (default: True if available)
+- obs_length (int): observed length of the trajectory (default: 8)
+- pred_length (int): predicted length of the trajectory (default: 12)
+- epoch (int): epoch of the model to be loaded (default: 24)
+- gru (bool): whether to use GRU cell or LSTM cell (default: False)
+- method (int): type of LSTM method (default: 1)</p>
+<blockquote>
+<div><p>1: social LSTM
+2: obstacle LSTM
+3: vanilla LSTM</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>parsed arguments</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>args (argparse.Namespace)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.helper.get_final_error">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.helper.</span></span><span class="sig-name descname"><span class="pre">get_final_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ret_nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assumedNodesPresent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trueNodesPresent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">look_up</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.helper.get_final_error" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ret_nodes</strong> (<em>A tensor</em><em> of </em><em>shape pred_length x numNodes x 2</em>)</p></li>
+<li><p><strong>nodes</strong> (<em>Contains the true positions for the</em>)</p></li>
+<li><p><strong>nodes</strong></p></li>
+<li><p><strong>nodes</strong></p></li>
+<li><p><strong>lists</strong> (<em>nodesPresent</em>)</p></li>
+<li><p><strong>time-step</strong> (<em>Each list contains the nodeIDs</em><em> of </em><em>the nodes present at that</em>)</p></li>
+<li><p><strong>look_up</strong> (<em>lookup table for determining which ped is in which array index</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li></li>
+<li><p><strong>Error</strong> (<em>Mean final euclidean distance between predicted trajectory and the true trajectory</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.helper.get_mean_error">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.helper.</span></span><span class="sig-name descname"><span class="pre">get_mean_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ret_nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assumedNodesPresent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trueNodesPresent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">using_cuda</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">look_up</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.helper.get_mean_error" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ret_nodes</strong> (<em>A tensor</em><em> of </em><em>shape pred_length x numNodes x 2</em>)</p></li>
+<li><p><strong>nodes</strong> (<em>Contains the true positions for the</em>)</p></li>
+<li><p><strong>nodes</strong></p></li>
+<li><p><strong>nodes</strong></p></li>
+<li><p><strong>lists</strong> (<em>nodesPresent</em>)</p></li>
+<li><p><strong>time-step</strong> (<em>Each list contains the nodeIDs</em><em> of </em><em>the nodes present at that</em>)</p></li>
+<li><p><strong>look_up</strong> (<em>lookup table for determining which ped is in which array index</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li></li>
+<li><p><strong>Error</strong> (<em>Mean euclidean distance between predicted trajectory and the true trajectory</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.helper.get_method_name">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.helper.</span></span><span class="sig-name descname"><span class="pre">get_method_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.helper.get_method_name" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the method name given the index.</p>
+<p>Parameters:
+index (int) : Index of the method (1 = Social LSTM, 2 = Obstacle LSTM, 3 = Vanilla LSTM)</p>
+<p>Returns:
+str : Method name</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.helper.get_model">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.helper.</span></span><span class="sig-name descname"><span class="pre">get_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arguments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">infer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.helper.get_model" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a model given the index and arguments.</p>
+<p>Parameters:
+index (int) : Index of the model (1 = Social LSTM, 2 = Obstacle LSTM, 3 = Vanilla LSTM)
+arguments (dict) : Arguments to pass to the model
+infer (bool, optional) : Whether to use the model for inference or training. Defaults to False.</p>
+<p>Returns:
+nn.Module : The model</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.helper.remove_file_extention">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.helper.</span></span><span class="sig-name descname"><span class="pre">remove_file_extention</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.helper.remove_file_extention" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.helper.revert_seq">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.helper.</span></span><span class="sig-name descname"><span class="pre">revert_seq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PedsList_seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lookup_seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_values_dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.helper.revert_seq" title="Link to this definition">¶</a></dt>
+<dd><p>Converts a sequence of velocity tensors to absolute position tensors.</p>
+<p>Parameters:
+- x_seq: Tensor of shape (seq_len, num_peds, 2), velocity vectors
+- PedsList_seq: List of pedestrian ID lists per frame
+- lookup_seq: Dictionary mapping ped IDs to indices in the tensor
+- first_values_dict: Dictionary of initial absolute positions per ped ID</p>
+<p>Returns:
+- absolute_x_seq: Tensor of same shape as x_seq with absolute positions</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.helper.rotate">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.helper.</span></span><span class="sig-name descname"><span class="pre">rotate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">origin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.helper.rotate" title="Link to this definition">¶</a></dt>
+<dd><p>Rotate a point counterclockwise by a given angle around a given origin.</p>
+<p>The angle should be given in radians.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.helper.rotate_traj_with_target_ped">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.helper.</span></span><span class="sig-name descname"><span class="pre">rotate_traj_with_target_ped</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PedsList_seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lookup_seq</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.helper.rotate_traj_with_target_ped" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.helper.sample_gaussian_2d">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.helper.</span></span><span class="sig-name descname"><span class="pre">sample_gaussian_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mux</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">muy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodesPresent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">look_up</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.helper.sample_gaussian_2d" title="Link to this definition">¶</a></dt>
+<dd><p>Sample from a 2D Gaussian for each node.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mux</strong> (<em>tensors</em><em> of </em><em>shape</em><em> (</em><em>1</em><em>, </em><em>numNodes</em><em>)</em>) – Mean and std values for each node.</p></li>
+<li><p><strong>muy</strong> (<em>tensors</em><em> of </em><em>shape</em><em> (</em><em>1</em><em>, </em><em>numNodes</em><em>)</em>) – Mean and std values for each node.</p></li>
+<li><p><strong>sx</strong> (<em>tensors</em><em> of </em><em>shape</em><em> (</em><em>1</em><em>, </em><em>numNodes</em><em>)</em>) – Mean and std values for each node.</p></li>
+<li><p><strong>sy</strong> (<em>tensors</em><em> of </em><em>shape</em><em> (</em><em>1</em><em>, </em><em>numNodes</em><em>)</em>) – Mean and std values for each node.</p></li>
+<li><p><strong>corr</strong> (<em>tensors</em><em> of </em><em>shape</em><em> (</em><em>1</em><em>, </em><em>numNodes</em><em>)</em>) – Mean and std values for each node.</p></li>
+<li><p><strong>nodesPresent</strong> (<em>list</em>) – List of node IDs present in this frame.</p></li>
+<li><p><strong>look_up</strong> (<em>dict</em>) – Maps node IDs to array indices.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>next_x, next_y</strong> – Sampled x and y values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tensors of shape (numNodes,)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.helper.sample_validation_data">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.helper.</span></span><span class="sig-name descname"><span class="pre">sample_validation_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Pedlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">look_up</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_pedlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataloader</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.helper.sample_validation_data" title="Link to this definition">¶</a></dt>
+<dd><p>The validation sample function
+params:
+x_seq: Input positions
+Pedlist: Peds present in each frame
+args: arguments
+net: The model
+num_pedlist : number of peds in each frame
+look_up : lookup table for determining which ped is in which array index</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.helper.sample_validation_data_vanilla">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.helper.</span></span><span class="sig-name descname"><span class="pre">sample_validation_data_vanilla</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Pedlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">look_up</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_pedlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataloader</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.helper.sample_validation_data_vanilla" title="Link to this definition">¶</a></dt>
+<dd><p>The validation sample function for vanilla method
+params:
+x_seq: Input positions
+Pedlist: Peds present in each frame
+args: arguments
+net: The model
+num_pedlist : number of peds in each frame
+look_up : lookup table for determining which ped is in which array index</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.helper.time_lr_scheduler">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.helper.</span></span><span class="sig-name descname"><span class="pre">time_lr_scheduler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr_decay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr_decay_epoch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.helper.time_lr_scheduler" title="Link to this definition">¶</a></dt>
+<dd><p>Decay learning rate by a factor of lr_decay every lr_decay_epoch epochs</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.helper.translate">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.helper.</span></span><span class="sig-name descname"><span class="pre">translate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PedsList_seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lookup_seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.helper.translate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.helper.unique_list">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.helper.</span></span><span class="sig-name descname"><span class="pre">unique_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.helper.unique_list" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.helper.vectorize_seq">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.helper.</span></span><span class="sig-name descname"><span class="pre">vectorize_seq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PedsList_seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lookup_seq</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.helper.vectorize_seq" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="social-lstm-utils-hyperparameter-module">
+<h2>social_lstm.utils.hyperparameter module<a class="headerlink" href="#social-lstm-utils-hyperparameter-module" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-social_lstm.utils.make_directories">
+<span id="social-lstm-utils-make-directories-module"></span><h2>social_lstm.utils.make_directories module<a class="headerlink" href="#module-social_lstm.utils.make_directories" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.make_directories.make_directories">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.make_directories.</span></span><span class="sig-name descname"><span class="pre">make_directories</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.make_directories.make_directories" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-social_lstm.utils.model">
+<span id="social-lstm-utils-model-module"></span><h2>social_lstm.utils.model module<a class="headerlink" href="#module-social_lstm.utils.model" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="social_lstm.utils.model.SocialModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">social_lstm.utils.model.</span></span><span class="sig-name descname"><span class="pre">SocialModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">infer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.model.SocialModel" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.model.SocialModel.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.model.SocialModel.forward" title="Link to this definition">¶</a></dt>
+<dd><p>Forward pass for the model
+params:
+input_data: Input positions
+grids: Grid masks
+hidden_states: Hidden states of the peds
+cell_states: Cell states of the peds
+PedsList: id of peds in each frame for this sequence</p>
+<p>returns:
+outputs_return: Outputs corresponding to bivariate Gaussian distributions
+hidden_states
+cell_states</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.model.SocialModel.getSocialTensor">
+<span class="sig-name descname"><span class="pre">getSocialTensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_states</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.model.SocialModel.getSocialTensor" title="Link to this definition">¶</a></dt>
+<dd><p>Computes the social tensor for a given grid mask and hidden states of all peds
+params:
+grid : Grid masks
+hidden_states : Hidden states of all peds</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-social_lstm.utils.model_inference">
+<span id="social-lstm-utils-model-inference-module"></span><h2>social_lstm.utils.model_inference module<a class="headerlink" href="#module-social_lstm.utils.model_inference" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.model_inference.load_model">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.model_inference.</span></span><span class="sig-name descname"><span class="pre">load_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_dir</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.model_inference.load_model" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.model_inference.predict_trajectory">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.model_inference.</span></span><span class="sig-name descname"><span class="pre">predict_trajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_traj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_PedsList_seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pedsList_seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">saved_args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimensions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lookup_seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_values_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_gru</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_grid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.model_inference.predict_trajectory" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.model_inference.prepare_sequence">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.model_inference.</span></span><span class="sig-name descname"><span class="pre">prepare_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pedsList_seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">saved_args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimensions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.model_inference.prepare_sequence" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-social_lstm.utils.olstm_model">
+<span id="social-lstm-utils-olstm-model-module"></span><h2>social_lstm.utils.olstm_model module<a class="headerlink" href="#module-social_lstm.utils.olstm_model" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="social_lstm.utils.olstm_model.OLSTMModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">social_lstm.utils.olstm_model.</span></span><span class="sig-name descname"><span class="pre">OLSTMModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">infer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.olstm_model.OLSTMModel" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.olstm_model.OLSTMModel.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.olstm_model.OLSTMModel.forward" title="Link to this definition">¶</a></dt>
+<dd><p>Forward pass for the model
+params:
+input_data: Input positions
+grids: Grid masks
+hidden_states: Hidden states of the peds
+cell_states: Cell states of the peds
+PedsList: id of peds in each frame for this sequence</p>
+<p>returns:
+outputs_return: Outputs corresponding to bivariate Gaussian distributions
+hidden_states
+cell_states</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.olstm_model.OLSTMModel.getObsTensor">
+<span class="sig-name descname"><span class="pre">getObsTensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.olstm_model.OLSTMModel.getObsTensor" title="Link to this definition">¶</a></dt>
+<dd><p>Computes the obstacle map tensor for a given grid mask and hidden states of all peds
+params:
+grid : Grid masks</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-social_lstm.utils.path_prediction">
+<span id="social-lstm-utils-path-prediction-module"></span><h2>social_lstm.utils.path_prediction module<a class="headerlink" href="#module-social_lstm.utils.path_prediction" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.path_prediction.prediction_step">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.path_prediction.</span></span><span class="sig-name descname"><span class="pre">prediction_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ped_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.path_prediction.prediction_step" title="Link to this definition">¶</a></dt>
+<dd><p>Make predictions for all pedestrians in the current frame.</p>
+<p>Parameters:
+ped_data (list of [id, x, y]): A list of pedestrian observations.
+frame (numpy array): The current frame.</p>
+<p>Returns:
+list of (id, predicted_array): A list of tuples containing the id of each pedestrian and an array of their predicted coordinates.</p>
+</dd></dl>
+
+</section>
+<section id="module-social_lstm.utils.pixel_to_3dpoint">
+<span id="social-lstm-utils-pixel-to-3dpoint-module"></span><h2>social_lstm.utils.pixel_to_3dpoint module<a class="headerlink" href="#module-social_lstm.utils.pixel_to_3dpoint" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.pixel_to_3dpoint.pixel_to_3dpoint">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.pixel_to_3dpoint.</span></span><span class="sig-name descname"><span class="pre">pixel_to_3dpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth_frame</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.pixel_to_3dpoint.pixel_to_3dpoint" title="Link to this definition">¶</a></dt>
+<dd><p>Calculates the 3D point corresponding to a given pixel coordinate (u, v)
+in a depth frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>int</em>)</p></li>
+<li><p><strong>v</strong> (<em>int</em>)</p></li>
+<li><p><strong>depth</strong> (<em>float</em><em>, </em><em>optional</em>) – Depth value at the given pixel coordinate. Must be given if depth_frame is None.</p></li>
+<li><p><strong>intr</strong> (<em>rs.intrinsics</em><em>, </em><em>optional</em>) – Intrinsics of the depth frame. Must be given if depth_frame is None.</p></li>
+<li><p><strong>depth_frame</strong> (<em>rs.depth_frame</em><em>, </em><em>optional</em>) – Depth frame containing the depth value at the given pixel coordinate.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>point</strong> – 3D point [X, Y, Z] corresponding to the given pixel coordinate.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.array</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If neither depth+intr nor depth_frame is given, or if the pixel coordinates (u, v) are None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.pixel_to_3dpoint.pixel_to_3dpoint_median">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.pixel_to_3dpoint.</span></span><span class="sig-name descname"><span class="pre">pixel_to_3dpoint_median</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth_frame</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.pixel_to_3dpoint.pixel_to_3dpoint_median" title="Link to this definition">¶</a></dt>
+<dd><p>Calculates the 3D point corresponding to a given pixel coordinate (u, v)
+in a depth frame by taking the median of all depth values within a
+specified radius (r) around the pixel coordinate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> (<em>int</em>)</p></li>
+<li><p><strong>v</strong> (<em>int</em>) – Pixel coordinates.</p></li>
+<li><p><strong>intr</strong> (<em>rs.intrinsics</em><em>, </em><em>optional</em>) – Intrinsics of the depth frame. Must be given if depth_frame is None.</p></li>
+<li><p><strong>depth_frame</strong> (<em>rs.depth_frame</em><em>, </em><em>optional</em>) – Depth frame containing the depth value at the given pixel coordinate.
+Must be given if depth is None.</p></li>
+<li><p><strong>h</strong> (<em>int</em><em>, </em><em>optional</em>) – Height of the depth frame. Must be given if depth_frame is None.</p></li>
+<li><p><strong>w</strong> (<em>int</em><em>, </em><em>optional</em>) – Width of the depth frame. Must be given if depth_frame is None.</p></li>
+<li><p><strong>r</strong> (<em>int</em><em>, </em><em>optional</em>) – Radius around the pixel coordinate to take the median depth value.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>point</strong> – 3D point [X, Y, Z] corresponding to the given pixel coordinate.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.array</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If neither depth+intr nor depth_frame is given, or if the pixel coordinates (u, v) are None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-social_lstm.utils.rtSequenceBuffer">
+<span id="social-lstm-utils-rtsequencebuffer-module"></span><h2>social_lstm.utils.rtSequenceBuffer module<a class="headerlink" href="#module-social_lstm.utils.rtSequenceBuffer" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="social_lstm.utils.rtSequenceBuffer.RealTimeSequenceBuffer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">social_lstm.utils.rtSequenceBuffer.</span></span><span class="sig-name descname"><span class="pre">RealTimeSequenceBuffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observation_length</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.rtSequenceBuffer.RealTimeSequenceBuffer" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.rtSequenceBuffer.RealTimeSequenceBuffer.convert_x_seq_format">
+<span class="sig-name descname"><span class="pre">convert_x_seq_format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_seq_str_arrays</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.rtSequenceBuffer.RealTimeSequenceBuffer.convert_x_seq_format" title="Link to this definition">¶</a></dt>
+<dd><p>Convert a sequence of string arrays to a sequence of float arrays.</p>
+<p>Parameters:
+x_seq_str_arrays (list of list of str): A sequence of string arrays.</p>
+<p>Returns:
+list of numpy.ndarray: A sequence of float arrays.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.rtSequenceBuffer.RealTimeSequenceBuffer.get_sequence">
+<span class="sig-name descname"><span class="pre">get_sequence</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.rtSequenceBuffer.RealTimeSequenceBuffer.get_sequence" title="Link to this definition">¶</a></dt>
+<dd><p>Get the sequence of observations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A sequence of observations, where each frame is a numpy array of shape (num_peds, 3).
+pedsList_seq (list of list of int): A sequence of pedestrian IDs per frame.
+current_ids (list of int): A list of pedestrian IDs in the current frame.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>x_seq (list of numpy.ndarray)</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The sequence buffer will be cleared after calling this function.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.rtSequenceBuffer.RealTimeSequenceBuffer.is_ready">
+<span class="sig-name descname"><span class="pre">is_ready</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.rtSequenceBuffer.RealTimeSequenceBuffer.is_ready" title="Link to this definition">¶</a></dt>
+<dd><p>Check if the sequence buffer is ready for inference.</p>
+<p>Returns:
+bool: True if the sequence buffer is ready, False otherwise.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.rtSequenceBuffer.RealTimeSequenceBuffer.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id_xy_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.rtSequenceBuffer.RealTimeSequenceBuffer.update" title="Link to this definition">¶</a></dt>
+<dd><p>Update the sequence buffer with new observations.</p>
+<p>Parameters:
+id_xy_list (list of [id, x, y]): A list of observations.</p>
+<p>Returns:
+None</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-social_lstm.utils.shm_writer">
+<span id="social-lstm-utils-shm-writer-module"></span><h2>social_lstm.utils.shm_writer module<a class="headerlink" href="#module-social_lstm.utils.shm_writer" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="social_lstm.utils.shm_writer.ShmPredictionWriter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">social_lstm.utils.shm_writer.</span></span><span class="sig-name descname"><span class="pre">ShmPredictionWriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'predictions_shm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_targets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_points_per_target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.shm_writer.ShmPredictionWriter" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Writes 3D prediction results to shared memory in a compact binary struct format.</p>
+<dl>
+<dt>Correct layout (matching ROS reader):</dt><dd><p>int32 num_targets
+For each target:</p>
+<blockquote>
+<div><p>int32 person_id
+int32 num_points
+repeated (float32 x, float32 y, float32 z)</p>
+</div></blockquote>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.shm_writer.ShmPredictionWriter.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.shm_writer.ShmPredictionWriter.close" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.shm_writer.ShmPredictionWriter.unlink">
+<span class="sig-name descname"><span class="pre">unlink</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.shm_writer.ShmPredictionWriter.unlink" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.shm_writer.ShmPredictionWriter.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.shm_writer.ShmPredictionWriter.write" title="Link to this definition">¶</a></dt>
+<dd><dl>
+<dt>predictions must be a list of dicts:</dt><dd><dl class="simple">
+<dt>{</dt><dd><p>“target_id”: int,
+“points”: [(x,y,z), …]</p>
+</dd>
+</dl>
+<p>}</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-social_lstm.utils.test">
+<span id="social-lstm-utils-test-module"></span><h2>social_lstm.utils.test module<a class="headerlink" href="#module-social_lstm.utils.test" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.test.main">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.test.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.test.main" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.test.sample">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.test.</span></span><span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Pedlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_Pedlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">saved_args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimensions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">look_up</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_gru</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.test.sample" title="Link to this definition">¶</a></dt>
+<dd><p>The sample function
+params:
+x_seq: Input positions
+Pedlist: Peds present in each frame
+args: arguments
+net: The model
+true_x_seq: True positions
+true_Pedlist: The true peds present in each frame
+saved_args: Training arguments
+dimensions: The dimensions of the dataset
+target_id: ped_id number that try to predict in this sequence</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="social_lstm.utils.test.submission_preprocess">
+<span class="sig-prename descclassname"><span class="pre">social_lstm.utils.test.</span></span><span class="sig-name descname"><span class="pre">submission_preprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataloader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ret_x_seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.test.submission_preprocess" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-social_lstm.utils.utils">
+<span id="social-lstm-utils-utils-module"></span><h2>social_lstm.utils.utils module<a class="headerlink" href="#module-social_lstm.utils.utils" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="social_lstm.utils.utils.DataLoader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">social_lstm.utils.utils.</span></span><span class="sig-name descname"><span class="pre">DataLoader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f_prefix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seq_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_of_validation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forcePreProcess</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">infer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.utils.DataLoader" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.utils.DataLoader.add_element_to_dict">
+<span class="sig-name descname"><span class="pre">add_element_to_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.utils.DataLoader.add_element_to_dict" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.utils.DataLoader.clean_ped_list">
+<span class="sig-name descname"><span class="pre">clean_ped_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pedlist_seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_lenght</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_lenght</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.utils.DataLoader.clean_ped_list" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.utils.DataLoader.clean_test_data">
+<span class="sig-name descname"><span class="pre">clean_test_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_lenght</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_lenght</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.utils.DataLoader.clean_test_data" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.utils.DataLoader.convert_proper_array">
+<span class="sig-name descname"><span class="pre">convert_proper_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pedlist</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.utils.DataLoader.convert_proper_array" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.utils.DataLoader.create_folder_file_dict">
+<span class="sig-name descname"><span class="pre">create_folder_file_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.utils.DataLoader.create_folder_file_dict" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.utils.DataLoader.frame_preprocess">
+<span class="sig-name descname"><span class="pre">frame_preprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dirs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation_set</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.utils.DataLoader.frame_preprocess" title="Link to this definition">¶</a></dt>
+<dd><p>Function that will pre-process the pixel_pos.csv files of each dataset
+into data with occupancy grid that can be used
+params:
+data_dirs : List of directories where raw data resides
+data_file : The file into which all the pre-processed data needs to be stored
+validation_set: true when a dataset is in validation set</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.utils.DataLoader.get_all_directory_namelist">
+<span class="sig-name descname"><span class="pre">get_all_directory_namelist</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.utils.DataLoader.get_all_directory_namelist" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.utils.DataLoader.get_base_file_name">
+<span class="sig-name descname"><span class="pre">get_base_file_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.utils.DataLoader.get_base_file_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.utils.DataLoader.get_dataset_dimension">
+<span class="sig-name descname"><span class="pre">get_dataset_dimension</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.utils.DataLoader.get_dataset_dimension" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.utils.DataLoader.get_dataset_path">
+<span class="sig-name descname"><span class="pre">get_dataset_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_prefix</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.utils.DataLoader.get_dataset_path" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.utils.DataLoader.get_directory_name">
+<span class="sig-name descname"><span class="pre">get_directory_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.utils.DataLoader.get_directory_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.utils.DataLoader.get_directory_name_with_pointer">
+<span class="sig-name descname"><span class="pre">get_directory_name_with_pointer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pointer_index</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.utils.DataLoader.get_directory_name_with_pointer" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.utils.DataLoader.get_file_name">
+<span class="sig-name descname"><span class="pre">get_file_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pointer_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'train'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.utils.DataLoader.get_file_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.utils.DataLoader.get_file_path">
+<span class="sig-name descname"><span class="pre">get_file_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.utils.DataLoader.get_file_path" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.utils.DataLoader.get_frame_sequence">
+<span class="sig-name descname"><span class="pre">get_frame_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame_lenght</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.utils.DataLoader.get_frame_sequence" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.utils.DataLoader.get_id_sequence">
+<span class="sig-name descname"><span class="pre">get_id_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame_lenght</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.utils.DataLoader.get_id_sequence" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.utils.DataLoader.get_len_of_dataset">
+<span class="sig-name descname"><span class="pre">get_len_of_dataset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.utils.DataLoader.get_len_of_dataset" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.utils.DataLoader.load_preprocessed">
+<span class="sig-name descname"><span class="pre">load_preprocessed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation_set</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.utils.DataLoader.load_preprocessed" title="Link to this definition">¶</a></dt>
+<dd><p>Function to load the pre-processed data into the DataLoader object
+params:
+data_file : the path to the pickled data file
+validation_set : flag for validation dataset</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.utils.DataLoader.next_batch">
+<span class="sig-name descname"><span class="pre">next_batch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.utils.DataLoader.next_batch" title="Link to this definition">¶</a></dt>
+<dd><p>Function to get the next batch of points</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.utils.DataLoader.next_valid_batch">
+<span class="sig-name descname"><span class="pre">next_valid_batch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.utils.DataLoader.next_valid_batch" title="Link to this definition">¶</a></dt>
+<dd><p>Function to get the next Validation batch of points</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.utils.DataLoader.reset_batch_pointer">
+<span class="sig-name descname"><span class="pre">reset_batch_pointer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">valid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.utils.DataLoader.reset_batch_pointer" title="Link to this definition">¶</a></dt>
+<dd><p>Reset all pointers</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.utils.DataLoader.switch_to_dataset_type">
+<span class="sig-name descname"><span class="pre">switch_to_dataset_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">train</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.utils.DataLoader.switch_to_dataset_type" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.utils.DataLoader.tick_batch_pointer">
+<span class="sig-name descname"><span class="pre">tick_batch_pointer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">valid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.utils.DataLoader.tick_batch_pointer" title="Link to this definition">¶</a></dt>
+<dd><p>Advance the dataset pointer</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.utils.DataLoader.write_dataset">
+<span class="sig-name descname"><span class="pre">write_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.utils.DataLoader.write_dataset" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.utils.DataLoader.write_to_file">
+<span class="sig-name descname"><span class="pre">write_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_prefix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.utils.DataLoader.write_to_file" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.utils.DataLoader.write_to_plot_file">
+<span class="sig-name descname"><span class="pre">write_to_plot_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.utils.DataLoader.write_to_plot_file" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="social-lstm-utils-validation-module">
+<h2>social_lstm.utils.validation module<a class="headerlink" href="#social-lstm-utils-validation-module" title="Link to this heading">¶</a></h2>
+</section>
+<section id="social-lstm-utils-visualize-module">
+<h2>social_lstm.utils.visualize module<a class="headerlink" href="#social-lstm-utils-visualize-module" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-social_lstm.utils.vlstm_model">
+<span id="social-lstm-utils-vlstm-model-module"></span><h2>social_lstm.utils.vlstm_model module<a class="headerlink" href="#module-social_lstm.utils.vlstm_model" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="social_lstm.utils.vlstm_model.VLSTMModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">social_lstm.utils.vlstm_model.</span></span><span class="sig-name descname"><span class="pre">VLSTMModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">infer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.vlstm_model.VLSTMModel" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="social_lstm.utils.vlstm_model.VLSTMModel.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#social_lstm.utils.vlstm_model.VLSTMModel.forward" title="Link to this definition">¶</a></dt>
+<dd><p>Forward pass for the model
+params:
+input_data: Input positions
+grids: Grid masks
+hidden_states: Hidden states of the peds
+cell_states: Cell states of the peds
+PedsList: id of peds in each frame for this sequence</p>
+<p>returns:
+outputs_return: Outputs corresponding to bivariate Gaussian distributions
+hidden_states
+cell_states</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-social_lstm.utils">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-social_lstm.utils" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Mensa Roboter</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">social_lstm</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="social_lstm.html">social_lstm package</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">social_lstm</a><ul>
+  <li><a href="social_lstm.html">social_lstm package</a><ul>
+      <li>Previous: <a href="social_lstm.training.html" title="previous chapter">social_lstm.training package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2026, Manuel Kaiser, Fabian Kröger.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../_sources/api/social_lstm.utils.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
