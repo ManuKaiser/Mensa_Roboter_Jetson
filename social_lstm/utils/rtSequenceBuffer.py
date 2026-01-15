@@ -79,18 +79,17 @@ class RealTimeSequenceBuffer:
 
 
     def get_sequence(self):
+        """
+        Get the sequence of observations.
 
-    """
-    Get the sequence of observations.
+        Returns:
+            x_seq (list of numpy.ndarray): A sequence of observations, where each frame is a numpy array of shape (num_peds, 3).
+            pedsList_seq (list of list of int): A sequence of pedestrian IDs per frame.
+            current_ids (list of int): A list of pedestrian IDs in the current frame.
 
-    Returns:
-        x_seq (list of numpy.ndarray): A sequence of observations, where each frame is a numpy array of shape (num_peds, 3).
-        pedsList_seq (list of list of int): A sequence of pedestrian IDs per frame.
-        current_ids (list of int): A list of pedestrian IDs in the current frame.
-
-    Notes:
-        The sequence buffer will be cleared after calling this function.
-    """
+        Notes:
+            The sequence buffer will be cleared after calling this function.
+        """
         x_seq_raw = list(self.obs_buffer)
         pedsList_seq = list(self.PedsList)
 
