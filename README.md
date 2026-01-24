@@ -1,6 +1,10 @@
-# Mensa-Roboter
+# Mensa_Roboter_Jetson
+
+This is the code running on the jetson. The code for ROS is here: https://github.com/FabCode288/Mobile_Robot_PI5
 
 This is an adaptation of https://github.com/quancore/social-lstm, the goal is to use it to predict the trajectories of pedestrians in front of the Robot and to later use them in navigation.
+
+
 
 ## Usage
 
