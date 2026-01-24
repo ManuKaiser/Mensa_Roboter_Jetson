@@ -285,6 +285,25 @@ def main():
     shm_image, writer = init_shared_memory()
 
     last_time = 0.0
+    state_cache = {}
+
+    WINDOW_NAME = "FULLSCREEN Video Stream"
+
+    # Create resizable window
+    cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
+
+    # Dummy frame to force window creation
+    dummy = np.zeros((FRAME_HEIGHT, FRAME_WIDTH, 3), dtype=np.uint8)
+    cv2.imshow(WINDOW_NAME, dummy)
+    cv2.waitKey(1)
+
+    # Switch to fullscreen
+    cv2.setWindowProperty(
+        WINDOW_NAME,
+        cv2.WND_PROP_FULLSCREEN,
+        cv2.WINDOW_FULLSCREEN
+    )
+
 
     try:
         while not shutdown_event.is_set():
@@ -313,7 +332,7 @@ def main():
             shm_image.buf[:frame.size] = frame.tobytes()
             writer.write(predictions, timestamp)
 
-            cv2.imshow("Social LSTM", frame)
+            cv2.imshow(WINDOW_NAME, frame)
             cv2.waitKey(1)
 
     finally:
