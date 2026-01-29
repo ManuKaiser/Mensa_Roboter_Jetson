@@ -46,8 +46,6 @@ def pixel_to_3dpoint(u=None, v=None, depth=None, intr=None, depth_frame=None):
 
 
 def pixel_to_3dpoint_median(u=None, v=None, intr=None, depth_frame=None, h=None, w=None, r=None):
-
-
     """
     Calculates the 3D point corresponding to a given pixel coordinate (u, v)
     in a depth frame by taking the median of all depth values within a
@@ -81,13 +79,13 @@ def pixel_to_3dpoint_median(u=None, v=None, intr=None, depth_frame=None, h=None,
         If neither depth+intr nor depth_frame is given, or if the pixel coordinates (u, v) are None.
     """
     if depth_frame is None and (depth is None or intr is None):
-        raise ValueError("Entweder depth+intr oder depth_frame muss übergeben werden.")
+        raise ValueError("depth+intr or depth_frame must be given")
 
     if intr is None:
         intr = depth_frame.profile.as_video_stream_profile().get_intrinsics()
 
     if u is None or v is None:
-        raise ValueError("Pixelkoordinaten (u, v) muss angegeben werden.")
+        raise ValueError("Pixelcoords(u, v) must be given")
 
     depths = []
 
@@ -107,6 +105,5 @@ def pixel_to_3dpoint_median(u=None, v=None, intr=None, depth_frame=None, h=None,
 
     depth = np.median(depths)
     
-
     point = rs.rs2_deproject_pixel_to_point(intr, [u, v], depth)
     return np.array(point)  # [X, Y, Z]

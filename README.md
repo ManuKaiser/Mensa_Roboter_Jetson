@@ -17,13 +17,34 @@ If not already set up:
 ```
 ./setup_system.sh
 ```
+---
+Start the docker container first:
 
+View all containers:
+```
+docker ps -a
+```
+
+Start the docker container:
+```
+docker start -ai <container ID>
+```
+
+Inside the container:
+```
+cd ~/Mobile_Robot_PI5/
+source install/setup.bash
+ros2 run camera_publisher camera_publisher
+```
+---
+
+When the publisher is ready:
 ```
 source social_lstm/.venv/bin/activate
 
 python -m social_lstm.scripts.video_main
 ```
-
+---
 To update the documentation:
 
 ```
