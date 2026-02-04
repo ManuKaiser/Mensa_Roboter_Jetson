@@ -38,7 +38,7 @@ ros2 run camera_publisher camera_publisher
 ```
 ---
 
-When the publisher is ready:
+When the publisher is ready (outside the container):
 ```
 source social_lstm/.venv/bin/activate
 
